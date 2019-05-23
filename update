@@ -1,0 +1,60 @@
+
+
+self.TLS_ID = 
+
+
+self.phases = dict() 
+# ts_ids
+for TLS in self.TLS_ID: 
+    phases[TLS] = CPhase(getDurationTimes(TLS))
+
+def getDurationTimes(self, TLS_ID):
+    '''
+    Input (str):   ID para optener todas las fases del tiempo.
+    Output (List): Regresa una lista con el tiempo de las fases y sus states del TLS
+                     en orden de ejecucion. [42.0, 'GGrr', 3.0, 'yyrr']
+    '''
+
+    b = str(traci.trafficlight.getCompleteRedYellowGreenDefinition(TLS_ID))
+    #b = str(traci.trafficlight.getCompleteRedYellowGreenDefinition('0'))
+    a = list(b.split())
+    duration = []
+    i = 0
+    while i < len(a):
+        if ('duration' in a[i]) == True:
+            r = (a[i].split("duration")[1]).rstrip(',').lstrip('=')
+            duration.append(float(r))
+        if ('state' in a[i]) == True:
+            j = (a[i]).split("state")[1].strip(',').strip('=').strip("'").strip("'")
+            duration.append(j)
+        i = i + 1
+
+    return  duration
+def CPhase(self, duration_state):
+    '''
+    Efectua el cambio de tiempo del TLS con los nuevos tiempos
+    Inputs: ID del TLS a cambiar[str], lista con tiempos de duraccion y de estados [List]
+    Output: lista del logic (solo como referencias futuras)
+
+    Ejemplo:
+    Input: (TLS_ID = '0', duration_state = [42.0, 'GGrr', 3.0, 'yyrr', 42.00, 'rrGG',3.0, 'rrGG'])
+    Output:
+        r = Logic(programID='0', type=0, currentPhaseIndex=0,
+            phases=[Phase(duration=42.0, state='GGrr', minDur=42.0, maxDur=42.0, next=-1),
+                    Phase(duration=3.0, state='yyrr', minDur=3.0, maxDur=3.0, next=-1),
+                    Phase(duration=42.0, state='rrGG', minDur=42.0, maxDur=42.0, next=-1),
+                    Phase(duration=3.0, state='rrGG', minDur=3.0, maxDur=3.0, next=-1)], subParameter={})
+
+    '''
+    t = []
+    i = 0
+    d_s = duration_state
+    while i < len(d_s):
+        x = d_s[i]
+        state = d_s[(i + 1)]
+        t_i = traci.trafficlight.Phase(x,state,x,x)
+        t.append(t_i)
+        i = i + 2
+    return t 
+
+
